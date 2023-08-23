@@ -18,6 +18,8 @@ from gnosis.safe.safe_signature import SafeSignature, SafeSignatureApprovedHash
 
 from safe_transaction_service.safe_messages import models as safe_message_models
 
+from .utils import get_safe_V1_4_1_contract
+
 from ..models import (
     EthereumTx,
     InternalTx,
@@ -101,9 +103,11 @@ class SafeTxProcessor(TxProcessor):
         self.safe_tx_failure_events = [
             get_safe_V1_0_0_contract(dummy_w3).events.ExecutionFailed(),
             get_safe_V1_3_0_contract(dummy_w3).events.ExecutionFailure(),
+            get_safe_V1_4_1_contract(dummy_w3).events.ExecutionFailure(),
         ]
         self.safe_tx_module_failure_events = [
-            get_safe_V1_3_0_contract(dummy_w3).events.ExecutionFromModuleFailure()
+            get_safe_V1_3_0_contract(dummy_w3).events.ExecutionFromModuleFailure(),
+            get_safe_V1_4_1_contract(dummy_w3).events.ExecutionFromModuleFailure(),
         ]
 
         self.safe_tx_failure_events_topics = {
