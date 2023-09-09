@@ -25,6 +25,8 @@ logger = get_task_logger(__name__)
 
 TASK_SOFT_TIME_LIMIT = 30  # 30 seconds
 TASK_TIME_LIMIT = 60  # 1 minute
+TASK_SOFT_TIME_LIMIT_EXTENDED = 60  # 1 minute
+TASK_TIME_LIMIT_EXTENDED = 120  # 2 minutes
 
 
 class ContractAction(Enum):
@@ -109,8 +111,8 @@ def reindex_contracts_without_metadata_task() -> int:
 
 
 @app.shared_task(
-    soft_time_limit=TASK_SOFT_TIME_LIMIT,
-    time_limit=TASK_TIME_LIMIT,
+    soft_time_limit=TASK_SOFT_TIME_LIMIT_EXTENDED,
+    time_limit=TASK_TIME_LIMIT_EXTENDED,
     autoretry_for=(EtherscanRateLimitError,),
     retry_backoff=10,
     retry_kwargs={"max_retries": 5},
