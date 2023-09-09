@@ -22,7 +22,12 @@ from ..models import (
     InternalTxType,
     SafeMasterCopy,
 )
-from .abis.gnosis import gnosis_safe_l2_v1_3_0_abi, proxy_factory_v1_3_0_abi
+from .abis.gnosis import (
+    gnosis_safe_l2_v1_3_0_abi,
+    gnosis_safe_l2_v1_4_1_abi,
+    proxy_factory_v1_3_0_abi,
+    proxy_factory_v1_4_1_abi,
+)
 from .events_indexer import EventsIndexer
 
 logger = getLogger(__name__)
@@ -135,40 +140,73 @@ class SafeEventsIndexer(EventsIndexer):
 
         :return: List of supported `ContractEvent`
         """
-        l2_contract = self.ethereum_client.w3.eth.contract(
+        l2_contract_v1_3_0 = self.ethereum_client.w3.eth.contract(
             abi=gnosis_safe_l2_v1_3_0_abi
         )
-        proxy_factory_contract = self.ethereum_client.w3.eth.contract(
+        proxy_factory_contract_v1_3_0 = self.ethereum_client.w3.eth.contract(
             abi=proxy_factory_v1_3_0_abi
         )
+        l2_contract_v1_4_1 = self.ethereum_client.w3.eth.contract(
+            abi=gnosis_safe_l2_v1_4_1_abi
+        )
+        proxy_factory_contract_v1_4_1 = self.ethereum_client.w3.eth.contract(
+            abi=proxy_factory_v1_4_1_abi
+        )
+
         old_contract = get_safe_V1_1_1_contract(self.ethereum_client.w3)
         return [
-            l2_contract.events.SafeMultiSigTransaction(),
-            l2_contract.events.SafeModuleTransaction(),
-            l2_contract.events.SafeSetup(),
-            l2_contract.events.ApproveHash(),
-            l2_contract.events.SignMsg(),
-            l2_contract.events.ExecutionFailure(),
-            l2_contract.events.ExecutionSuccess(),
-            # Modules
-            l2_contract.events.EnabledModule(),
-            l2_contract.events.DisabledModule(),
-            l2_contract.events.ExecutionFromModuleSuccess(),
-            l2_contract.events.ExecutionFromModuleFailure(),
-            # Owners
-            l2_contract.events.AddedOwner(),
-            l2_contract.events.RemovedOwner(),
-            l2_contract.events.ChangedThreshold(),
-            # Incoming Ether
-            l2_contract.events.SafeReceived(),
-            # Changed FallbackHandler
-            l2_contract.events.ChangedFallbackHandler(),
-            # Changed Guard
-            l2_contract.events.ChangedGuard(),
             # Change Master Copy
             old_contract.events.ChangedMasterCopy(),
+            # v1.3.0 events
+            l2_contract_v1_3_0.events.SafeMultiSigTransaction(),
+            l2_contract_v1_3_0.events.SafeModuleTransaction(),
+            l2_contract_v1_3_0.events.SafeSetup(),
+            l2_contract_v1_3_0.events.ApproveHash(),
+            l2_contract_v1_3_0.events.SignMsg(),
+            l2_contract_v1_3_0.events.ExecutionFailure(),
+            l2_contract_v1_3_0.events.ExecutionSuccess(),
+            # Modules
+            l2_contract_v1_3_0.events.EnabledModule(),
+            l2_contract_v1_3_0.events.DisabledModule(),
+            l2_contract_v1_3_0.events.ExecutionFromModuleSuccess(),
+            l2_contract_v1_3_0.events.ExecutionFromModuleFailure(),
+            # Owners
+            l2_contract_v1_3_0.events.AddedOwner(),
+            l2_contract_v1_3_0.events.RemovedOwner(),
+            l2_contract_v1_3_0.events.ChangedThreshold(),
+            # Incoming Ether
+            l2_contract_v1_3_0.events.SafeReceived(),
+            # Changed FallbackHandler
+            l2_contract_v1_3_0.events.ChangedFallbackHandler(),
+            # Changed Guard
+            l2_contract_v1_3_0.events.ChangedGuard(),
             # Proxy creation
-            proxy_factory_contract.events.ProxyCreation(),
+            proxy_factory_contract_v1_3_0.events.ProxyCreation(),
+            # v1.4.1 events
+            l2_contract_v1_4_1.events.SafeMultiSigTransaction(),
+            l2_contract_v1_4_1.events.SafeModuleTransaction(),
+            l2_contract_v1_4_1.events.SafeSetup(),
+            l2_contract_v1_4_1.events.ApproveHash(),
+            l2_contract_v1_4_1.events.SignMsg(),
+            l2_contract_v1_4_1.events.ExecutionFailure(),
+            l2_contract_v1_4_1.events.ExecutionSuccess(),
+            # Modules
+            l2_contract_v1_4_1.events.EnabledModule(),
+            l2_contract_v1_4_1.events.DisabledModule(),
+            l2_contract_v1_4_1.events.ExecutionFromModuleSuccess(),
+            l2_contract_v1_4_1.events.ExecutionFromModuleFailure(),
+            # Owners
+            l2_contract_v1_4_1.events.AddedOwner(),
+            l2_contract_v1_4_1.events.RemovedOwner(),
+            l2_contract_v1_4_1.events.ChangedThreshold(),
+            # Incoming Ether
+            l2_contract_v1_4_1.events.SafeReceived(),
+            # Changed FallbackHandler
+            l2_contract_v1_4_1.events.ChangedFallbackHandler(),
+            # Changed Guard
+            l2_contract_v1_4_1.events.ChangedGuard(),
+            # Proxy creation
+            proxy_factory_contract_v1_4_1.events.ProxyCreation(),
         ]
 
     @property

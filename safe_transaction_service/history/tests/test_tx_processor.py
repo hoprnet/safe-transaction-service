@@ -396,6 +396,7 @@ class TestSafeTxProcessor(SafeTestCaseMixin, TestCase):
         safe_1_1_0_master_copy = SafeMasterCopyFactory(version="1.1.0")
         safe_1_2_0_master_copy = SafeMasterCopyFactory(version="1.2.0")
         safe_1_3_0_master_copy = SafeMasterCopyFactory(version="1.3.0")
+        safe_1_4_1_master_copy = SafeMasterCopyFactory(version="1.4.1")
         tx_processor.process_decoded_transaction(
             InternalTxDecodedFactory(
                 function_name="setup",

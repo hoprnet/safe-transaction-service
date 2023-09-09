@@ -12,6 +12,7 @@ from gnosis.safe.tests.safe_test_case import SafeTestCaseMixin
 
 from ..indexers import SafeEventsIndexer, SafeEventsIndexerProvider
 from ..indexers.tx_processor import SafeTxProcessor
+from ..indexers.utils import get_safe_V1_4_1_contract
 from ..models import (
     EthereumTx,
     EthereumTxCallType,
@@ -74,7 +75,7 @@ class TestSafeEventsIndexer(SafeTestCaseMixin, TestCase):
             }
         )
 
-        dangling_event: LogReceipt = AttributeDict(
+        valid_event_with_indexed: LogReceipt = AttributeDict(
             {
                 "address": "0x1E44C806f1AfD4f420C10c8088f4e0388F066E7A",
                 "topics": [
@@ -99,20 +100,35 @@ class TestSafeEventsIndexer(SafeTestCaseMixin, TestCase):
             }
         )
 
-        # Dangling event topic is "supported"
-        self.assertIn(
-            dangling_event["topics"][0].hex(), self.safe_events_indexer.events_to_listen
-        )
+        # Valid event with additional indexed data is supported
+        self.assertIn(valid_event_with_indexed["topics"][0].hex(), self.safe_events_indexer.events_to_listen)
 
-        # Dangling event cannot be decoded
-        self.assertEqual(self.safe_events_indexer.decode_elements([dangling_event]), [])
+        expected_event_with_indexed = AttributeDict(
+            {
+                "args": AttributeDict(
+                    {"owner": "0x20212521370Dd2ddE0b0e3aC25b65EB3E859d303"}
+                ),
+                "event": "AddedOwner",
+                "logIndex": 290,
+                "transactionIndex": 89,
+                "transactionHash": HexBytes(
+                    "0xc19ef099702fb9f7d7962925428683eff534e009210ef2cf23135f43962c192a"
+                ),
+                "address": "0x1E44C806f1AfD4f420C10c8088f4e0388F066E7A",
+                "blockHash": HexBytes(
+                    "0x6b41eac9177a1606e1a853adf3f3da018fcf476f7d217acb69b7d130bdfaf2c9"
+                ),
+                "blockNumber": 10129293
+            }
+        )
+        self.assertEqual(
+            self.safe_events_indexer.decode_elements([valid_event_with_indexed]),
+            [expected_event_with_indexed]
+        )
 
         # Valid event is supported
-        self.assertIn(
-            valid_event["topics"][0].hex(), self.safe_events_indexer.events_to_listen
-        )
+        self.assertIn(valid_event["topics"][0].hex(), self.safe_events_indexer.events_to_listen)
 
-        # Dangling event cannot be decoded
         expected_event = AttributeDict(
             {
                 "args": AttributeDict(
@@ -135,7 +151,15 @@ class TestSafeEventsIndexer(SafeTestCaseMixin, TestCase):
             self.safe_events_indexer.decode_elements([valid_event]), [expected_event]
         )
 
-    def test_safe_events_indexer(self):
+    def test_safe_events_indexer_v1_3_0(self):
+        self.shared_safe_events_indexer_tests("1.3.0", get_safe_V1_3_0_contract)
+
+    def test_safe_events_indexer_v1_4_1(self):
+        self.shared_safe_events_indexer_tests("1.4.1", get_safe_V1_4_1_contract)
+
+    def shared_safe_events_indexer_tests(
+        self, safe_contract_vsn, safe_contract_load_fun
+    ):
         owner_account_1 = self.ethereum_test_account
         owners = [owner_account_1.address]
         threshold = 1
@@ -162,7 +186,7 @@ class TestSafeEventsIndexer(SafeTestCaseMixin, TestCase):
             address=self.safe_contract.address,
             initial_block_number=initial_block_number,
             tx_block_number=initial_block_number,
-            version="1.3.0",
+            version=safe_contract_vsn,
             l2=True,
         )
         ethereum_tx_sent = self.proxy_factory.deploy_proxy_contract(
@@ -172,7 +196,7 @@ class TestSafeEventsIndexer(SafeTestCaseMixin, TestCase):
         )
         safe_address = ethereum_tx_sent.contract_address
         safe = Safe(safe_address, self.ethereum_client)
-        safe_contract = get_safe_V1_3_0_contract(self.w3, safe_address)
+        safe_contract = safe_contract_load_fun(self.w3, safe_address)
         self.assertEqual(safe_contract.functions.VERSION().call(), "1.3.0")
 
         self.assertEqual(InternalTx.objects.count(), 0)
