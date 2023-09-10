@@ -23,8 +23,8 @@ from .models import Contract
 
 logger = get_task_logger(__name__)
 
-TASK_SOFT_TIME_LIMIT = 30  # 30 seconds
-TASK_TIME_LIMIT = 60  # 1 minute
+TASK_SOFT_TIME_LIMIT = 120  # 4 minutes
+TASK_TIME_LIMIT = 600  # 10 minute
 
 
 class ContractAction(Enum):
