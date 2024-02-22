@@ -10,7 +10,7 @@ from hexbytes import HexBytes
 from web3.contract.contract import ContractEvent
 from web3.types import EventData
 
-from gnosis.eth import EthereumClient
+from gnosis.eth import EthereumClientProvider
 from gnosis.eth.constants import NULL_ADDRESS
 from gnosis.eth.contracts import get_safe_V1_1_1_contract
 
@@ -43,7 +43,7 @@ class SafeEventsIndexerProvider:
     def get_new_instance(cls) -> "SafeEventsIndexer":
         from django.conf import settings
 
-        return SafeEventsIndexer(EthereumClient(settings.ETHEREUM_NODE_URL))
+        return SafeEventsIndexer(EthereumClientProvider())
 
     @classmethod
     def del_singleton(cls):
