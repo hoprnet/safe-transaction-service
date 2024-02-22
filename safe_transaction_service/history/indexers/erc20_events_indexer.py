@@ -8,7 +8,7 @@ from eth_typing import ChecksumAddress
 from web3.contract.contract import ContractEvent
 from web3.types import EventData, LogReceipt
 
-from gnosis.eth import EthereumClient
+from gnosis.eth import EthereumClientProvider
 
 from ...utils.utils import FixedSizeDict
 from ..models import (
@@ -34,7 +34,7 @@ class Erc20EventsIndexerProvider:
     def get_new_instance(cls) -> "Erc20EventsIndexer":
         from django.conf import settings
 
-        return Erc20EventsIndexer(EthereumClient(settings.ETHEREUM_NODE_URL))
+        return Erc20EventsIndexer(EthereumClientProvider())
 
     @classmethod
     def del_singleton(cls):
