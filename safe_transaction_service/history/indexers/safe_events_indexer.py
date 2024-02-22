@@ -41,8 +41,6 @@ class SafeEventsIndexerProvider:
 
     @classmethod
     def get_new_instance(cls) -> "SafeEventsIndexer":
-        from django.conf import settings
-
         return SafeEventsIndexer(EthereumClientProvider())
 
     @classmethod
