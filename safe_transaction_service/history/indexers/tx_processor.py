@@ -65,11 +65,7 @@ class SafeTxProcessorProvider:
             from django.conf import settings
 
             ethereum_client = EthereumClientProvider()
-            ethereum_tracing_client = (
-                EthereumClient(settings.ETHEREUM_TRACING_NODE_URL)
-                if settings.ETHEREUM_TRACING_NODE_URL
-                else None
-            )
+            ethereum_tracing_client = EthereumClientProvider()
 
             if not ethereum_tracing_client:
                 logger.warning("Ethereum tracing client was not configured")

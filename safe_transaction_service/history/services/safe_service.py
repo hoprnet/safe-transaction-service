@@ -56,11 +56,7 @@ class SafeServiceProvider:
             from django.conf import settings
 
             ethereum_client = EthereumClientProvider()
-            ethereum_tracing_client = (
-                EthereumClient(settings.ETHEREUM_TRACING_NODE_URL)
-                if settings.ETHEREUM_TRACING_NODE_URL
-                else None
-            )
+            ethereum_tracing_client = EthereumClientProvider()
             cls.instance = SafeService(ethereum_client, ethereum_tracing_client)
         return cls.instance
 

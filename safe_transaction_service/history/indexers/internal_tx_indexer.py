@@ -9,7 +9,7 @@ from eth_typing import ChecksumAddress, HexStr
 from hexbytes import HexBytes
 from web3.types import BlockTrace, FilterTrace
 
-from gnosis.eth import EthereumClient
+from gnosis.eth import EthereumClientProvider
 
 from safe_transaction_service.contracts.tx_decoder import (
     CannotDecode,
@@ -41,7 +41,7 @@ class InternalTxIndexerProvider:
             instance_class = InternalTxIndexer
 
         return instance_class(
-            EthereumClient(settings.ETHEREUM_TRACING_NODE_URL),
+            EthereumClientProvider(),
         )
 
     @classmethod
